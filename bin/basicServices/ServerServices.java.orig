@@ -1,0 +1,47 @@
+package basicServices;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Collection;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class ServerServices {
+
+	private ServerSocket sSkt;
+	private Socket skt;
+	private Thread thread;
+	// private ObjectInputStream in;
+	// private ObjectOutputStream out;
+	private LinkedBlockingQueue<Object> objects;
+
+	public static final int PORT = 9999;
+
+	public ServerServices() throws IOException {
+		Thread.currentThread().setPriority(9);
+		objects = new LinkedBlockingQueue<>();
+		while (true) {
+			sSkt = new ServerSocket(PORT);
+			skt = sSkt.accept();
+			thread=new socketThread(skt,objects);
+		}
+
+	}
+}
+
+class socketThread extends Thread{
+	
+	private Socket skt;
+	private ClientServices cs;
+	private LinkedBlockingQueue<Object> objects; 
+	
+	public socketThread(Socket skt,LinkedBlockingQueue<Object> objects) throws IOException {
+		this.skt=skt;
+		cs=new ClientServices(skt);
+		this.objects=objects;
+	}
+	
+}
